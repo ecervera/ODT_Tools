@@ -5,6 +5,9 @@ import odf.opendocument as odt
 
 import zipfile
 
+meta_label = ['IC', 'CreationDate', 'DS', 'EC', 'ED']
+stat_label = ['Pages', 'Pars', 'Chars', 'NWSp']
+        
 class OdtData:
     def __init__(self, filename):
         self.filename = filename
@@ -37,7 +40,7 @@ class OdtData:
             return h.zfill(2) + ':' + m.zfill(2) + ':' + s[:-1].zfill(2)
 
         self.meta = {}
-        meta_label = ['IC', 'CreationDate', 'DS', 'EC', 'ED', 'EditingTime']
+        #meta_label = ['IC', 'CreationDate', 'DS', 'EC', 'ED']
         meta_type = [odf.meta.InitialCreator, odf.meta.CreationDate, 
                     odf.meta.DateString, odf.meta.EditingCycles, odf.meta.EditingDuration]
 
@@ -54,7 +57,7 @@ class OdtData:
             
     def _read_stat(self):
         self.stat = {}
-        stat_label = ['Pages', 'Pars', 'Chars', 'NWSp']
+        #stat_label = ['Pages', 'Pars', 'Chars', 'NWSp']
         stat_attr = ['pagecount', 'paragraphcount', 'charactercount', 'nonwhitespacecharactercount']
 
         ds = self.doc.meta.getElementsByType(odf.meta.DocumentStatistic)
@@ -84,6 +87,6 @@ class OdtData:
         self.P = []
         self.emptyPars = 0
         for p in self.doc.getElementsByType(text.P):
-            self.P.append({'style': p.getAttribute('stylename').replace('_20_','_'), 'text': str(p)})
+            self.P.append({'style': str(p.getAttribute('stylename')).replace('_20_','_'), 'text': str(p)})
             if len(str(p)) == 0:
                 self.emptyPars += 1
