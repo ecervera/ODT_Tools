@@ -5,7 +5,7 @@ import odf.opendocument as odt
 
 import zipfile
 
-meta_label = ['IC', 'CD', 'DS', 'EC', 'ED']
+meta_label = ['IC', 'CD', 'DS', 'EC', 'ED', 'EDf']
 stat_label = ['Pages', 'Pars', 'Chars', 'NWSp']
         
 class OdtData:
@@ -34,19 +34,30 @@ class OdtData:
             else:
                 h = '0'
             if 'M' in t:
-                m, s = t.split('M')
+                m, t = t.split('M')
             else:
-                m, s = '0', t
+                m = '0'
+            if 'S' in t:
+                s, _ = t.split('S')
+            else:
+                s = '0'
+            if int(s) >= 60:
+                m = str(int(s) // 60)
+                s = str(int(s) % 60)
+                if int(m) >= 60:
+                    h = str(int(m) // 60)
+                    m = str(int(m) % 60)
             return h.zfill(2) + ':' + m.zfill(2) + ':' + s[:-1].zfill(2)
 
         self.meta = {}
         meta_type = [odf.meta.InitialCreator, odf.meta.CreationDate, 
-                     odf.meta.DateString, odf.meta.EditingCycles, odf.meta.EditingDuration]
+                     odf.meta.DateString, odf.meta.EditingCycles, 
+                     odf.meta.EditingDuration, odf.meta.EditingDuration]
 
         for l, t in zip(meta_label, meta_type):
             element = self.doc.meta.getElementsByType( t )
             if element:
-                if t == odf.meta.EditingDuration:
+                if l == 'EDf':
                     data = format_time( str(element[0]))
                 else:
                     data = str(element[0])
