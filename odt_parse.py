@@ -47,7 +47,7 @@ class OdtData:
                 if int(m) >= 60:
                     h = str(int(m) // 60)
                     m = str(int(m) % 60)
-            return h.zfill(2) + ':' + m.zfill(2) + ':' + s[:-1].zfill(2)
+            return h.zfill(2) + ':' + m.zfill(2) + ':' + s.zfill(2)
 
         self.meta = {}
         meta_type = [odf.meta.InitialCreator, odf.meta.CreationDate, 
