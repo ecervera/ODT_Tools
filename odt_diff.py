@@ -1,5 +1,7 @@
+from odt_parse import str_decode
+
 def style_id(name, par_st):
-    if name[0]=='P':
+    if name[0]=='P' or name[0]=='p':
         parent = [st['parent'] for st in par_st if st['name']==name]
         sid = 'formato directo sobre ' + parent[0]
     else:
@@ -7,12 +9,19 @@ def style_id(name, par_st):
     return sid
 
 def find_style_by_name(stlist, name):
-    st = [st for st in stlist if st['name'] == name]
+    dname = str_decode(name)
+    st = [st for st in stlist if st['name'] == dname]
     if st:
           return st[0]
     else:
           return None
-    
+
+def find_heading_by_text(hlist, text):
+    return [h for h in hlist if text in h['text']]  
+
+def find_par_by_text(plist, text):
+    return [p for p in plist if text in p['text']]
+
 def odt_compare(ref, doc):
     s = ''
 

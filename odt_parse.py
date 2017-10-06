@@ -7,9 +7,14 @@ import zipfile
 
 meta_label = ['IC', 'CD', 'DS', 'EC', 'ED', 'EDf']
 stat_label = ['Pages', 'Pars', 'Chars', 'NWSp']
-        
+
+from unidecode import unidecode
+
+def str_decode(s):
+    return unidecode(s).lower().replace('_20_','_').replace('_5f_','_').replace(' ','_')
+
 class OdtData:
-    def __init__(self, filename, par_prop=[], text_prop=[]):
+    def __init__(self, filename, par_prop=[], text_prop=[], page_prop=[]):
         self.filename = filename
         self.doc = None
         self.err = None
@@ -17,7 +22,7 @@ class OdtData:
             self.doc = odt.load(filename)
             self._read_meta()
             self._read_stat()
-            self._read_styles(par_prop, text_prop)
+            self._read_styles(par_prop, text_prop, page_prop)
             self._read_headings()
             self._read_pars()
         except FileNotFoundError:
@@ -75,19 +80,30 @@ class OdtData:
             for (l,a) in zip(stat_label, stat_attr):
                 self.stat[l] = ds[0].getAttribute( a )        
         
-    def _read_styles(self, par_prop, text_prop):
+    def _read_styles(self, par_prop, text_prop, page_prop):
         self.style = {}
         self.style['paragraph'] = []
         self.style['text'] = []
         self.style['graphic'] = []
+        self.style['page'] = []
+        
+        for st in self.doc.getElementsByType(style.MasterPage):
+            name = st.getAttribute('name')
+            stdict = {'name': str_decode(name)} 
+            for pp in page_prop:
+                attr = st.getAttribute(pp)
+                if attr:
+                        stdict[pp] = str_decode(attr)
+            self.style['page'].append(stdict)
+
         self.directFormat = 0
         for st in self.doc.getElementsByType(style.Style):
-            name = st.getAttribute('name').replace('_20_','_')
+            name = st.getAttribute('name')
             parent = st.getAttribute('parentstylename')
             family = st.getAttribute('family')
             if parent:
-                parent = parent.replace('_20_','_')
-            stdict = {'name': name, 
+                parent = str_decode(parent)
+            stdict = {'name': str_decode(name), 
                       'parent': parent}
             stpp = st.getElementsByType(style.ParagraphProperties)
             if stpp:
@@ -109,7 +125,10 @@ class OdtData:
         self.H = []
         self.emptyHeadings = 0
         for h in self.doc.getElementsByType(text.H):
-            self.H.append({'style': h.getAttribute('stylename').replace('_20_','_'), 'text': str(h)})
+            sn = h.getAttribute('stylename')
+            if sn is None:
+                sn = ''
+            self.H.append({'style': str_decode(sn), 'text': str(h)})
             if len(str(h)) == 0:
                 self.emptyHeadings += 1
             
@@ -117,6 +136,6 @@ class OdtData:
         self.P = []
         self.emptyPars = 0
         for p in self.doc.getElementsByType(text.P):
-            self.P.append({'style': str(p.getAttribute('stylename')).replace('_20_','_'), 'text': str(p)})
+            self.P.append({'style': str_decode(str(p.getAttribute('stylename'))), 'text': str(p)})
             if len(str(p)) == 0:
                 self.emptyPars += 1

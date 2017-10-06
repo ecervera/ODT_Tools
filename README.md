@@ -3,7 +3,11 @@
 ## Installation
 * Install Miniconda
 * Install jupyter with conda
+    conda install jupyter
+* Install unidecode with conda
+    conda install unidecode
 * Install odfpy with pip
+    pip install odfpy
 
 ## Notebooks
 * ODT Data: analyse a document
