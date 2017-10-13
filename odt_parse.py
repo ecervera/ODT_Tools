@@ -86,6 +86,7 @@ class OdtData:
         self.style['text'] = []
         self.style['graphic'] = []
         self.style['page'] = []
+        self.style['section'] = []
         
         for st in self.doc.getElementsByType(style.MasterPage):
             name = st.getAttribute('name')
