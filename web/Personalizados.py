@@ -121,6 +121,7 @@ class UploadAndCheck(tornado.web.RequestHandler):
                 s = compare_style_attrs(ref, doc)
         except KeyError:
             s = "No s'ha triat cap fitxer."
+        s += '<br><hr><button type="button" onclick="javascript:history.back()">Back</button>'
         self.finish(s)
 
 
