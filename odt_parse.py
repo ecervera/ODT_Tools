@@ -118,9 +118,12 @@ class OdtData:
                     attr = sttp[0].getAttribute(tp)
                     if attr:
                         stdict[tp] = attr
-            self.style[family].append(stdict)
-            if family=='paragraph' and name[0]=='P' and name[1:].isdigit():
-                self.directFormat += 1
+            try:
+                self.style[family].append(stdict)
+                if family=='paragraph' and name[0]=='P' and name[1:].isdigit():
+                    self.directFormat += 1
+            except KeyError:
+                pass
             
     def _read_headings(self):
         self.H = []
